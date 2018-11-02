@@ -1,6 +1,6 @@
 import Posts from './components/post/index.vue'
 import Admin from './components/admin/admin.vue'
-import CreatePost from './components/admin/create-post.vue'
+import PostSingle from './components/post/single-post.vue'
 
 /*
    TODO: setup all routes
@@ -19,14 +19,17 @@ import CreatePost from './components/admin/create-post.vue'
 export default [
    {
       path: '/',
+      name: 'Posts',
       component: Posts
    },
    {
       path: '/admin',
+      name: 'Admin',
       component: Admin
    },
    {
-      path: '/create-post',
-      component: CreatePost
+      path: '/post/:id',
+      name: 'Post',
+      component: PostSingle
    }
 ]

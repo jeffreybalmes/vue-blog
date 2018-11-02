@@ -10,16 +10,10 @@
          <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
                <li class="nav-item active">
-                  <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                  <router-link class="nav-link" to="/">Home</router-link>
                </li>
                <li class="nav-item">
-                  <a class="nav-link" href="login.html">Login</a>
-               </li>
-               <li class="nav-item">
-                  <router-link to="/">Home</router-link>
-               </li>
-               <li class="nav-item">
-                  <router-link to="/admin">Admin</router-link>
+                  <router-link class="nav-link" to="/admin">Admin</router-link>
                </li>
             </ul>
          </div>

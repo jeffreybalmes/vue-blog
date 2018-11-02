@@ -5,7 +5,7 @@
          v-model="value"
          @keyup="filter(value)"
          @keyup.13="filter(value)"
-      placeholder="Search...">
+         placeholder="Search...">
 
       <div class="input-group-append">
          <button class="btn btn-outline-danger" type="button" @click.prevent="value = ''; filter(value)">x</button>
@@ -23,7 +23,11 @@ export default {
    },
    methods: {
       filter(value) {
-         this.$emit('updateList', value);
+         if (value !== '') {
+            this.$router.push({ path: '/', query: { search: this.value }});
+         } else {
+            this.$router.push({ path: '/'});
+         }
       }
    }
 }

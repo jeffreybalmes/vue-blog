@@ -1,16 +1,7 @@
 <template>
    <div class="col-md-4">
-
-      <search-box
-         v-if="show"
-         @updateList="filter($event)">
-      </search-box>
-
-      <category-list
-         :cats="cats"
-         @updateList="filter($event)">
-      </category-list>
-
+      <search-box v-if="show"></search-box>
+      <category-list :cats="cats"></category-list>
    </div> <!-- /.col-md-4 -->
 </template>
 
@@ -28,11 +19,6 @@ export default {
    data() {
       return {
          value: ''
-      }
-   },
-   methods: {
-      filter(value) {
-         this.$emit('updateList', value);
       }
    }
 }
