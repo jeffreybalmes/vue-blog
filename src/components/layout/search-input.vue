@@ -16,6 +16,7 @@
 <script>
 export default {
    name: 'search-input',
+   props: ['component'],
    data() {
       return {
          value: ''
@@ -23,10 +24,18 @@ export default {
    },
    methods: {
       filter(value) {
-         if (value !== '') {
-            this.$router.push({ path: '/', query: { search: this.value }});
+         if (this.component == 'index') {
+            if (value !== '') {
+               this.$router.push({ path: '/', query: { search: this.value }});
+            } else {
+               this.$router.push({ path: '/'});
+            }
          } else {
-            this.$router.push({ path: '/'});
+            if (value !== '') {
+               this.$router.push({ path: '/admin/post', query: { search: this.value }});
+            } else {
+               this.$router.push({ path: '/admin/post'});
+            }
          }
       }
    }

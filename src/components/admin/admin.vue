@@ -2,43 +2,42 @@
    <div>
       <div class="container-fluid">
          <div class="row">
+            <admin-menu :isActive="component"></admin-menu>
 
-            <admin-menu
-               :posts="filteredBlogs"
-               :cats="categories"
-               :isActive="component"
-               @showPosts="showPostsTable()"
-               @showCategories="showCategoriesTable()">
-            </admin-menu>
-
-            <admin-table
-               v-if="component == 'post-table'"
-               :posts="filteredBlogs"
-               @updateList="updateList($event)"
-               @showAddForm="component = 'create-post'"
-               @editPost="readPost($event)"
-               @deletePost="deletePost($event)">
-            </admin-table>
-
-            <category-table
-               v-if="component == 'category-table'"
-               @deleteCategory="deleteCategory($event)"
-               @updateCategoryList="showCategoriesTable()"
-               :cats="categories">
-            </category-table>
-
-            <update-post
-               v-else-if="component == 'update-post'"
-               :blog="post"
-               :cats="categories"
-               @back="showPostsTable()">
-            </update-post>
-
-            <create-post
-               v-else-if="component == 'create-post'"
-               :cats="categories"
-               @back="showPostsTable()">
-            </create-post>
+            <div class="col-10 mb-5">
+               <h2 class="mb-3 ml-1 mt-4">Posts</h2>
+               <router-link to="/admin/post/create" class="btn btn-primary mr-5">Add Post</router-link>
+               <div class="float-right">
+                  <search-box></search-box>
+               </div>
+               <div class="table-responsive">
+                  <table class="table table-striped">
+                     <thead>
+                        <tr>
+                           <th scope="col">#</th>
+                           <th scope="col">Title</th>
+                           <th scope="col">Body</th>
+                           <th scope="col">Category</th>
+                           <th scope="col">Command</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        <tr v-for="blog, i in filteredBlogs">
+                           <th scope="row">{{blog.id}}</th>
+                           <td>{{blog.title}}</td>
+                           <td>
+                              {{blog.body.length < 50 ? blog.body : blog.body.substring(0, 49)+" [...]"}}
+                           </td>
+                           <td>{{blog.category_name}}</td>
+                           <td>
+                              <router-link :to="'/admin/post/edit/'+ blog.id" class="btn btn-outline-secondary btn-sm">Edit</router-link>
+                              <button class="btn btn-outline-danger btn-sm" @click="deletePost(blog.id, i)">Delete</button>
+                           </td>
+                        </tr>
+                     </tbody>
+                  </table>
+               </div>
+            </div> <!-- /.col-10 -->
 
          </div>
       </div>
@@ -48,44 +47,24 @@
 <script>
 
 import SideNav from './side-nav.vue'
-import PostTable from './post-table.vue'
-import CategoryTable from './category-table.vue'
-import CreatePost from './create-post.vue'
-import UpdatePost from './update-post.vue'
+import searchInput from '../layout/search-input.vue'
 import searchBlogs from '../../mixins/searchMixin.js'
-
 
 export default {
    name: 'admin',
    components: {
       'admin-menu': SideNav,
-      'admin-table': PostTable,
-      'category-table': CategoryTable,
-      'create-post': CreatePost,
-      'update-post': UpdatePost
+      'search-box': searchInput
    },
    data() {
       return {
          component: 'post-table',
          blogs: [],
-         post: {},
-         filter: '',
-         categories: [],
+         filter: this.$route.query.search
       }
    },
    methods: {
-      readPost(id) {
-         fetch("http://localhost/02phpprojects/simple_blog_pdo/api/post/read_single.php?id=" + id)
-            .then(response => response.json())
-            .then((data) => {
-               this.post = data;
-            });
-         this.component = 'update-post'
-      },
-      updateList(search) {
-         this.filter = search;
-      },
-      deletePost(args) {
+      deletePost(...args) {
          fetch("http://localhost/02phpprojects/simple_blog_pdo/api/post/delete.php", {
             body: JSON.stringify({ id: args[0] }),
             method: "DELETE",
@@ -98,45 +77,19 @@ export default {
             this.status = message;
             this.blogs.splice(args[1], 1);
          })
-      },
-      deleteCategory(args) {
-         fetch("http://localhost/02phpprojects/simple_blog_pdo/api/category/delete.php", {
-            body: JSON.stringify({ id: args[0] }),
-            method: "DELETE",
-            headers: {
-               'Content-Type': 'application/json'
-            }
-         })
-         .then(response => response.json())
-         .then((message) => {
-            this.status = message;
-            this.categories.splice(args[1], 1);
-         })
-      },
-      fetchData() {
-         fetch("http://localhost/02phpprojects/simple_blog_pdo/api/post/read.php")
-            .then(response => response.json())
-            .then((blogs) => {
-               this.blogs = blogs;
-
-               fetch("http://localhost/02phpprojects/simple_blog_pdo/api/category/read.php")
-                  .then(response => response.json())
-                  .then((categories) => {
-                     this.categories = categories;
-                  })
-            })
-      },
-      showPostsTable() {
-         this.fetchData();
-         this.component = 'post-table';
-      },
-      showCategoriesTable() {
-         this.fetchData();
-         this.component = 'category-table';
-      },
+      }
+   },
+   watch: {
+      $route(to, from) {
+         this.filter = this.$route.query.search;
+      }
    },
    mounted() {
-      this.fetchData();
+      fetch("http://localhost/02phpprojects/simple_blog_pdo/api/post/read.php")
+         .then(response => response.json())
+         .then((blogs) => {
+            this.blogs = blogs;
+         })
    },
    mixins: [searchBlogs]
 };

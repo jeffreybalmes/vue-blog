@@ -1,6 +1,6 @@
 <template>
    <div class="col-md-4">
-      <search-box v-if="show"></search-box>
+      <search-box v-if="show" :component="component"></search-box>
       <category-list :cats="cats"></category-list>
    </div> <!-- /.col-md-4 -->
 </template>
@@ -15,7 +15,7 @@ export default {
       'search-box': searchInput,
       'category-list': categoryList
    },
-   props: ['cats', 'show'],
+   props: ['cats', 'show', 'component'],
    data() {
       return {
          value: ''

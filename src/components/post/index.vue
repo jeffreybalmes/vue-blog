@@ -29,7 +29,7 @@
                </div>
             </div> <!-- /.col-md-8 -->
 
-            <app-sidebar :cats="categories" :show="true"></app-sidebar>
+            <app-sidebar :cats="categories" :show="true" :component="'index'"></app-sidebar>
 
          </div>
       </div>
@@ -49,23 +49,8 @@ export default {
    data() {
       return {
          blogs: [],
-         post: {},
          filter: this.$route.query.search,
          categories: [],
-      }
-   },
-   methods: {
-      fetchData() {
-         fetch("http://localhost/02phpprojects/simple_blog_pdo/api/post/read.php")
-            .then(response => response.json())
-            .then((blogs) => {
-               this.blogs = blogs;
-            })
-         fetch("http://localhost/02phpprojects/simple_blog_pdo/api/category/read.php")
-            .then(response => response.json())
-            .then((categories) => {
-               this.categories = categories;
-            })
       }
    },
    watch: {
@@ -74,7 +59,16 @@ export default {
       }
    },
    mounted() {
-      this.fetchData();
+      fetch("http://localhost/02phpprojects/simple_blog_pdo/api/post/read.php")
+         .then(response => response.json())
+         .then((blogs) => {
+            this.blogs = blogs;
+         })
+      fetch("http://localhost/02phpprojects/simple_blog_pdo/api/category/read.php")
+         .then(response => response.json())
+         .then((categories) => {
+            this.categories = categories;
+         })
    },
    mixins: [searchBlogs]
 }
