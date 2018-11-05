@@ -37,7 +37,8 @@
 </template>
 
 <script>
-
+import { mapState } from 'vuex'
+import { mapActions } from 'vuex'
 import Sidebar from '../layout/sidebar.vue'
 import searchBlogs from '../../mixins/searchMixin.js'
 
@@ -48,27 +49,29 @@ export default {
    },
    data() {
       return {
-         blogs: [],
-         filter: this.$route.query.search,
-         categories: [],
+         filter: this.$route.query.search
       }
+   },
+   computed: {
+      ...mapState({
+         blogs: state => state.blogs,
+         categories: state => state.categories,
+      }),
    },
    watch: {
       $route(to, from) {
          this.filter = this.$route.query.search;
       }
    },
+   methods: {
+      ...mapActions([
+         'fetchBlogs',
+         'fetchCategories'
+      ])
+   },
    mounted() {
-      fetch("http://localhost/02phpprojects/simple_blog_pdo/api/post/read.php")
-         .then(response => response.json())
-         .then((blogs) => {
-            this.blogs = blogs;
-         })
-      fetch("http://localhost/02phpprojects/simple_blog_pdo/api/category/read.php")
-         .then(response => response.json())
-         .then((categories) => {
-            this.categories = categories;
-         })
+      this.fetchBlogs();
+      this.fetchCategories();
    },
    mixins: [searchBlogs]
 }

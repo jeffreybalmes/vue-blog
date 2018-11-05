@@ -5,9 +5,9 @@
 
             <div class="col-md-8">
                <div>
-                  <h2>{{ post.title }}</h2>
-                  <small class="text-muted">{{ post.category_name }}</small>
-                  <p class="card-text mt-3 mb-2">{{ post.body }}</p>
+                  <h2>{{ blog.title }}</h2>
+                  <small class="text-muted">{{ blog.category_name }}</small>
+                  <p class="card-text mt-3 mb-2">{{ blog.body }}</p>
                   <div class="form-group mt-4">
                      <router-link to="/" class="btn btn-default">&laquo; Back</router-link>
                   </div>
@@ -22,7 +22,8 @@
 </template>
 
 <script>
-
+import { mapState } from 'vuex'
+import { mapActions } from 'vuex'
 import Sidebar from '../layout/sidebar.vue'
 import searchBlogs from '../../mixins/searchMixin.js'
 
@@ -34,21 +35,23 @@ export default {
    data() {
       return {
          id: this.$route.params.id,
-         post: {},
-         categories: []
       }
    },
+   computed: {
+      ...mapState({
+         blog: state => state.blog,
+         categories: state => state.categories,
+      }),
+   },
+   methods: {
+      ...mapActions([
+         'fetchBlog',
+         'fetchCategories'
+      ])
+   },
    created() {
-      fetch("http://localhost/02phpprojects/simple_blog_pdo/api/post/read_single.php?id=" + this.id)
-         .then(response => response.json())
-         .then((data) => {
-            this.post = data;
-         });
-      fetch("http://localhost/02phpprojects/simple_blog_pdo/api/category/read.php")
-         .then(response => response.json())
-         .then((categories) => {
-            this.categories = categories;
-         })
+      this.fetchBlog(this.id);
+      this.fetchCategories();
    }
 }
 </script>
