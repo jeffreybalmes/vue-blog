@@ -7,25 +7,25 @@
             <div class="col-9">
                <span class="alert alert-success float-right mt-4" role="alert">{{status.message}}</span>
                <h2 class="ml-5 mt-4 mb-3">Update Post</h2>
-               <form class="ml-5" method="post" @submit.prevent="updatePost(post)">
+               <form class="ml-5" @submit.prevent="saveBlog()">
                   <div class="row">
                      <div class="col-md-8">
                         <div class="form-group">
                            <label>Title</label>
-                           <input type="text" class="form-control" name="title" v-model="post.title">
+                           <input type="text" class="form-control" name="title" v-model="blog.title">
                         </div>
                         <div class="form-group">
                            <label>Body</label>
-                           <textarea class="form-control" name="body" rows="9" v-model="post.body">
+                           <textarea class="form-control" name="body" rows="9" v-model="blog.body">
                            </textarea>
                         </div>
                         <label class="my-1 mr-2">Categories</label>
-                        <select class="custom-select my-1 mr-sm-2" name="category_id" v-model="post.category_id">
-                           <option v-for="category in categories" :value="category.id" :selected="post.category_name == category.name">
+                        <select class="custom-select my-1 mr-sm-2" name="category_id" v-model="blog.category_id">
+                           <option v-for="category in categories" :value="category.id" :selected="blog.category_name == category.name">
                               {{category.name}}
                            </option>
                         </select>
-                        <input type="hidden" name="id" v-model="post.id"/>
+                        <input type="hidden" name="id" v-model="blog.id"/>
                         <div class="form-group mt-4">
                            <button type="submit" class="btn btn-primary" name="submit">Save</button>
                            <router-link to="/admin/post" class="btn btn-secondary">Cancel</router-link>
@@ -42,6 +42,7 @@
 </template>
 
 <script>
+import { mapState, mapActions } from 'vuex'
 import SideNav from './side-nav.vue'
 
 export default {
@@ -51,41 +52,35 @@ export default {
    },
    data() {
       return {
-         component: 'post-table',
-         id: this.$route.params.id,
-         post: {},
-         categories: [],
-         status: {},
+         id: this.$route.params.id
       }
    },
+   computed: {
+      ...mapState({
+         blog: state => state.blog,
+         categories: state => state.categories,
+         component: state => state.component,
+         status: state => state.status
+      })
+   },
    methods: {
-      updatePost(blog) {
-         fetch("http://localhost/02phpprojects/simple_blog_pdo/api/post/update.php", {
-            headers: {
-               'Accept': 'application/json',
-               'Content-Type': 'application/json'
-            },
-            method: 'PUT',
-            body: JSON.stringify(blog)
-         })
-         .then(response => response.json())
-         .then((message) => {
-            this.status = message;
-            this.$router.push({ path: '/admin/post'});
-         })
+      ...mapActions([
+         'fetchBlog',
+         'updateBlog',
+         'fetchCategories'
+      ]),
+      saveBlog() {
+         this.updateBlog()
+            .then(response => response.json())
+            .then((message) => {
+               this.$router.push({ path: '/admin/post'});
+               this.status = message;
+            })
       }
    },
    created() {
-      fetch("http://localhost/02phpprojects/simple_blog_pdo/api/post/read_single.php?id=" + this.id)
-         .then(response => response.json())
-         .then((data) => {
-            this.post = data;
-         });
-      fetch("http://localhost/02phpprojects/simple_blog_pdo/api/category/read.php")
-         .then(response => response.json())
-         .then((categories) => {
-            this.categories = categories;
-         })
+      this.fetchBlog(this.id);
+      this.fetchCategories();
    }
 }
 </script>

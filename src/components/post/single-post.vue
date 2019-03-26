@@ -14,7 +14,7 @@
                </div>
             </div> <!-- /.col-md-8 -->
 
-            <app-sidebar :cats="categories" :show="false"></app-sidebar>
+            <app-sidebar :showSearch="false"></app-sidebar>
 
          </div>
       </div>
@@ -22,8 +22,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
-import { mapActions } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 import Sidebar from '../layout/sidebar.vue'
 import searchBlogs from '../../mixins/searchMixin.js'
 

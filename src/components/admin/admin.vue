@@ -31,7 +31,7 @@
                            <td>{{blog.category_name}}</td>
                            <td>
                               <router-link :to="'/admin/post/edit/'+ blog.id" class="btn btn-outline-secondary btn-sm">Edit</router-link>
-                              <button class="btn btn-outline-danger btn-sm" @click="deletePost(blog.id, i)">Delete</button>
+                              <button class="btn btn-outline-danger btn-sm" @click="deleteBlog({id: blog.id, index: i})">Delete</button>
                            </td>
                         </tr>
                      </tbody>
@@ -45,7 +45,7 @@
 </template>
 
 <script>
-
+import { mapState, mapActions } from 'vuex'
 import SideNav from './side-nav.vue'
 import searchInput from '../layout/search-input.vue'
 import searchBlogs from '../../mixins/searchMixin.js'
@@ -58,26 +58,20 @@ export default {
    },
    data() {
       return {
-         component: 'post-table',
-         blogs: [],
          filter: this.$route.query.search
       }
    },
+   computed: {
+      ...mapState({
+         blogs: state => state.blogs,
+         component: state => state.component
+      }),
+   },
    methods: {
-      deletePost(...args) {
-         fetch("http://localhost/02phpprojects/simple_blog_pdo/api/post/delete.php", {
-            body: JSON.stringify({ id: args[0] }),
-            method: "DELETE",
-            headers: {
-               'Content-Type': 'application/json'
-            }
-         })
-         .then(response => response.json())
-         .then((message) => {
-            this.status = message;
-            this.blogs.splice(args[1], 1);
-         })
-      }
+      ...mapActions([
+         'fetchBlogs',
+         'deleteBlog'
+      ])
    },
    watch: {
       $route(to, from) {
@@ -85,11 +79,7 @@ export default {
       }
    },
    mounted() {
-      fetch("http://localhost/02phpprojects/simple_blog_pdo/api/post/read.php")
-         .then(response => response.json())
-         .then((blogs) => {
-            this.blogs = blogs;
-         })
+      this.fetchBlogs();
    },
    mixins: [searchBlogs]
 };

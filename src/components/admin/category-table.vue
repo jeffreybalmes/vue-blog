@@ -7,12 +7,12 @@
             <div class="col-5 mb-5">
                <h2 class="mb-3 ml-1 mt-4">Categories</h2>
 
-               <form method="post" @submit.prevent="addCategory()">
+               <form method="post" @submit.prevent="saveCategory()">
                   <div class="input-group mb-3">
                      <input type="text"
                         class="form-control"
                         name="name"
-                        :placeholder="info"
+                        :placeholder="editPlaceholder"
                         v-model="category.name">
 
                      <div class="input-group-append">
@@ -44,7 +44,7 @@
 
                               <button
                                  class="btn btn-outline-danger btn-sm"
-                                 @click="deleteCategory(cat.id, i)">
+                                 @click="deleteCategory({id: cat.id, index: i})">
                                  Delete
                               </button>
 
@@ -61,6 +61,7 @@
 </template>
 
 <script>
+import { mapState, mapActions } from 'vuex'
 import SideNav from './side-nav.vue'
 
 export default {
@@ -71,101 +72,60 @@ export default {
    data() {
       return {
          id: this.$route.params.id,
-         component: 'category-table',
-         status: {},
-         edit: false,
-         categories: [],
-         category: {},
-         info: 'add new category...'
+         request: ''
       }
+   },computed: {
+      ...mapState({
+         categories: state => state.categories,
+         category: state => state.category,
+         editCategory: state => state.editCategory,
+         editPlaceholder: state => state.editPlaceholder,
+         component: state => state.component,
+         status: state => state.status
+      }),
    },
    methods: {
-      fetchCategory() {
-         fetch("http://localhost/02phpprojects/simple_blog_pdo/api/category/read.php")
-         .then(response => response.json())
-         .then((categories) => {
-            this.categories = categories;
-         })
-      },
-      addCategory() {
+      ...mapActions([
+         'fetchCategories',
+         'fetchCategory',
+         'addCategory',
+         'updateCategory',
+         'deleteCategory',
+         'resetCategoryState'
+      ]),
+      saveCategory() {
          if (this.category.name == '') {
             alert('Please give a category name.');
          } else {
-            if (this.edit === false) {
-               // Add
-               fetch("http://localhost/02phpprojects/simple_blog_pdo/api/category/create.php", {
-                  headers: {
-                     'Accept': 'application/json',
-                     'Content-Type': 'application/json'
-                  },
-                  method: 'POST',
-                  body: JSON.stringify({
-                     name: this.category.name
-                  }),
-               })
-                  .then(response => response.json())
-                  .then((message) => {
-                     this.fetchCategory();
-                     this.status = message;
-                     this.category.name = '';
-                     this.category.id = '';
-                     this.info = 'add new category...';
-                     this.$router.push({ path: '/admin/category'});
-                  })
+            if (this.editCategory === false) {
+               this.request = this.addCategory();
             } else {
-               // Update
-               fetch("http://localhost/02phpprojects/simple_blog_pdo/api/category/update.php", {
-                  headers: {
-                     'Accept': 'application/json',
-                     'Content-Type': 'application/json'
-                  },
-                  method: 'PUT',
-                  body: JSON.stringify(this.category)
-               })
-                  .then(response => response.json())
-                  .then((message) => {
-                     this.$router.push({ path: '/admin/category'});
-                     this.fetchCategory();
-                     this.status = message;
-                     this.category.name = '';
-                     this.category.id = '';
-                     this.info = 'add new category...';
-                     this.edit = false;
-                  })
+               this.request = this.updateCategory();
             }
          }
-      },
-      deleteCategory(...args) {
-         fetch("http://localhost/02phpprojects/simple_blog_pdo/api/category/delete.php", {
-            body: JSON.stringify({ id: args[0] }),
-            method: "DELETE",
-            headers: {
-               'Content-Type': 'application/json'
-            }
-         })
-         .then(response => response.json())
-         .then((message) => {
-            this.status = message;
-            this.categories.splice(args[1], 1);
-         })
+
+         this.request
+            // FIXME: json issue
+            .then(() => {
+               this.resetCategoryState();
+               this.$router.push({ path: '/admin/category'});
+               this.fetchCategories();
+            })
       }
    },
    watch: {
       $route(to, from) {
+         this.resetCategoryState();
+
          this.id = this.$route.params.id;
          if(!this.id) {return}
 
-         fetch("http://localhost/02phpprojects/simple_blog_pdo/api/category/read_single.php?id=" + this.id)
-         .then(response => response.json())
-         .then((data) => {
-            this.category = data;
-            this.info = `edit ${this.category.name} category`;
-            this.edit = true;
-         });
+         this.fetchCategory(this.id);
       }
    },
    created() {
-      this.fetchCategory();
+      this.fetchCategories();
+      this.resetCategoryState();
    }
 }
 </script>

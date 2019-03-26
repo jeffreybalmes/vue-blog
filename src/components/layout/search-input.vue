@@ -8,7 +8,12 @@
          placeholder="Search...">
 
       <div class="input-group-append">
-         <button class="btn btn-outline-danger" type="button" @click.prevent="value = ''; filter(value)">x</button>
+         <button
+            class="btn btn-outline-danger"
+            type="button"
+            @click.prevent="value = ''; filter(value)">
+            x
+         </button>
       </div>
    </div> <!-- /.input-group mb-4 -->
 </template>
