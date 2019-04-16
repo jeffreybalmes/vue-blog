@@ -36,14 +36,14 @@ export const store = new Vuex.Store({
          state.editCategory = false;
       },
       fetchBlogs(state) {
-         fetch("http://localhost/02phpprojects/simple_blog_pdo/api/post/read.php")
+         fetch("https://jeffreybalmes.000webhostapp.com/api/post/read.php")
             .then(response => response.json())
             .then((blogs) => {
                state.blogs = blogs;
             })
       },
       fetchBlog(state, payload) {
-         fetch("http://localhost/02phpprojects/simple_blog_pdo/api/post/read_single.php?id=" + payload)
+         fetch("https://jeffreybalmes.000webhostapp.com/api/post/read_single.php?id=" + payload)
             .then(response => response.json())
             .then((data) => {
                state.blog.title = data.title;
@@ -53,7 +53,7 @@ export const store = new Vuex.Store({
             });
       },
       addBlog(state) {
-         fetch("http://localhost/02phpprojects/simple_blog_pdo/api/post/create.php", {
+         fetch("https://jeffreybalmes.000webhostapp.com/api/post/create.php", {
             headers: {
                'Accept': 'application/json',
                'Content-Type': 'application/json'
@@ -72,7 +72,7 @@ export const store = new Vuex.Store({
       // FIXME: update method
       updateBlog(state) {
          console.log(state.blog);
-         fetch("http://localhost/02phpprojects/simple_blog_pdo/api/post/update.php", {
+         fetch("https://jeffreybalmes.000webhostapp.com/api/post/update.php", {
             headers: {
                'Accept': 'application/json',
                'Content-Type': 'application/json'
@@ -82,7 +82,7 @@ export const store = new Vuex.Store({
          });
       },
       deleteBlog(state, payload) {
-         fetch("http://localhost/02phpprojects/simple_blog_pdo/api/post/delete.php", {
+         fetch("https://jeffreybalmes.000webhostapp.com/api/post/delete.php", {
             body: JSON.stringify({ id: payload.id }),
             method: "DELETE",
             headers: {
@@ -96,14 +96,14 @@ export const store = new Vuex.Store({
             })
       },
       fetchCategories(state) {
-         fetch("http://localhost/02phpprojects/simple_blog_pdo/api/category/read.php")
+         fetch("https://jeffreybalmes.000webhostapp.com/api/category/read.php")
             .then(response => response.json())
             .then((categories) => {
                state.categories = categories;
             })
       },
       fetchCategory(state, payload) {
-         fetch("http://localhost/02phpprojects/simple_blog_pdo/api/category/read_single.php?id=" + payload)
+         fetch("https://jeffreybalmes.000webhostapp.com/api/category/read_single.php?id=" + payload)
             .then(response => response.json())
             .then((data) => {
                state.category = data;
@@ -112,7 +112,7 @@ export const store = new Vuex.Store({
             });
       },
       addCategory(state) {
-         fetch("http://localhost/02phpprojects/simple_blog_pdo/api/category/create.php", {
+         fetch("https://jeffreybalmes.000webhostapp.com/api/category/create.php", {
             headers: {
                'Accept': 'application/json',
                'Content-Type': 'application/json'
@@ -124,7 +124,7 @@ export const store = new Vuex.Store({
          });
       },
       updateCategory(state) {
-         fetch("http://localhost/02phpprojects/simple_blog_pdo/api/category/update.php", {
+         fetch("https://jeffreybalmes.000webhostapp.com/api/category/update.php", {
             headers: {
                'Accept': 'application/json',
                'Content-Type': 'application/json'
@@ -134,7 +134,7 @@ export const store = new Vuex.Store({
          });
       },
       deleteCategory(state, payload) {
-         fetch("http://localhost/02phpprojects/simple_blog_pdo/api/category/delete.php", {
+         fetch("https://jeffreybalmes.000webhostapp.com/api/category/delete.php", {
             body: JSON.stringify({ id: payload.id }),
             method: "DELETE",
             headers: {
