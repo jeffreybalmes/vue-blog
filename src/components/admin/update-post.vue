@@ -5,7 +5,7 @@
             <admin-menu :isActive="component"></admin-menu>
 
             <div class="col-9">
-               <span class="alert alert-success float-right mt-4" role="alert">{{status.message}}</span>
+               <!-- <span class="alert alert-success float-right mt-4" role="alert">{{status.message}}</span> -->
                <h2 class="ml-5 mt-4 mb-3">Update Post</h2>
                <form class="ml-5" @submit.prevent="saveBlog()">
                   <div class="row">
@@ -70,11 +70,9 @@ export default {
          'fetchCategories'
       ]),
       saveBlog() {
-         this.updateBlog()
-            .then(response => response.json())
-            .then((message) => {
+         this.updateBlog(this.id)
+            .then(() => {
                this.$router.push({ path: '/admin/post'});
-               this.status = message;
             })
       }
    },

@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import db from '../components/firebaseInit';
 
 Vue.use(Vuex);
 
@@ -36,116 +37,97 @@ export const store = new Vuex.Store({
          state.editCategory = false;
       },
       fetchBlogs(state) {
-         fetch("https://jeffreybalmes.000webhostapp.com/api/post/read.php")
-            .then(response => response.json())
-            .then((blogs) => {
-               state.blogs = blogs;
+         db.collection('posts').get().then(querySnapshot => {
+            // state.blogs = [];
+            var dataArr = [];
+            querySnapshot.forEach(doc => {
+               db.collection('categories').doc(doc.data().category_id).get().then(documentSnapshot => {
+                  const data = {
+                     'id': doc.id,
+                     'title': doc.data().title,
+                     'body': doc.data().body,
+                     'category_id': doc.data().category_id,
+                     'category_name': documentSnapshot.data().name
+                  };
+
+                  dataArr.push(data);
+               });
             })
+            state.blogs = dataArr;
+         })
       },
       fetchBlog(state, payload) {
-         fetch("https://jeffreybalmes.000webhostapp.com/api/post/read_single.php?id=" + payload)
-            .then(response => response.json())
-            .then((data) => {
+         db.collection('posts').doc(payload).get()
+            .then(documentSnapshot => {
+               var data = documentSnapshot.data();
                state.blog.title = data.title;
                state.blog.body = data.body;
                state.blog.category_id = data.category_id;
-               state.blog.category_name = data.category_name;
-            });
+               db.collection('categories').doc(data.category_id).get().then(documentSnapshot => {
+                  state.blog.category_name = documentSnapshot.data().name;
+               });
+            })
       },
       addBlog(state) {
-         fetch("https://jeffreybalmes.000webhostapp.com/api/post/create.php", {
-            headers: {
-               'Accept': 'application/json',
-               'Content-Type': 'application/json'
-            },
-            method: 'POST',
-            body: JSON.stringify(state.blog)
-         })
-            .then(response => response.json())
-            .then((message) => {
-               state.status = message;
-               state.blog.title = '';
-               state.blog.body = '';
-               state.blog.category_id = '';
-            })
-      },
-      // FIXME: update method
-      updateBlog(state) {
-         console.log(state.blog);
-         fetch("https://jeffreybalmes.000webhostapp.com/api/post/update.php", {
-            headers: {
-               'Accept': 'application/json',
-               'Content-Type': 'application/json'
-            },
-            method: 'PUT',
-            body: JSON.stringify(state.blog)
+         db.collection('posts').add({
+            title: state.blog.title,
+            body: state.blog.body,
+            category_id: state.blog.category_id
          });
+         state.blog.title = '';
+         state.blog.body = '';
+         state.blog.category_id = '';
+      },
+      updateBlog(state, payload) {
+         db.collection('posts').doc(payload).update({
+            title: state.blog.title,
+            body: state.blog.body,
+            category_id: state.blog.category_id
+         })
+
       },
       deleteBlog(state, payload) {
-         fetch("https://jeffreybalmes.000webhostapp.com/api/post/delete.php", {
-            body: JSON.stringify({ id: payload.id }),
-            method: "DELETE",
-            headers: {
-               'Content-Type': 'application/json'
-            }
-         })
-            .then(response => response.json())
-            .then((message) => {
-               state.status = message;
-               state.blogs.splice(payload.index, 1);
-            })
+         if (confirm('are you sure?')) {
+            db.collection('posts').doc(payload.id).delete();
+            state.blogs.splice(payload.index, 1);
+         }
       },
       fetchCategories(state) {
-         fetch("https://jeffreybalmes.000webhostapp.com/api/category/read.php")
-            .then(response => response.json())
-            .then((categories) => {
-               state.categories = categories;
+         db.collection('categories').orderBy('name').get().then(querySnapshot => {
+            state.categories = [];
+            querySnapshot.forEach(doc => {
+               const data = {
+                  'id': doc.id,
+                  'name': doc.data().name
+               }
+               state.categories.push(data);
             })
+         })
       },
       fetchCategory(state, payload) {
-         fetch("https://jeffreybalmes.000webhostapp.com/api/category/read_single.php?id=" + payload)
-            .then(response => response.json())
-            .then((data) => {
-               state.category = data;
+         db.collection('categories').doc(payload).get()
+            .then(documentSnapshot => {
+               state.category.id = documentSnapshot.id;
+               state.category.name = documentSnapshot.data().name;
                state.editPlaceholder = `edit ${state.category.name} category`;
                state.editCategory = true;
-            });
+            })
       },
       addCategory(state) {
-         fetch("https://jeffreybalmes.000webhostapp.com/api/category/create.php", {
-            headers: {
-               'Accept': 'application/json',
-               'Content-Type': 'application/json'
-            },
-            method: 'POST',
-            body: JSON.stringify({
-               name: state.category.name
-            }),
-         });
+         db.collection('categories').add({
+            name: state.category.name
+         })
       },
-      updateCategory(state) {
-         fetch("https://jeffreybalmes.000webhostapp.com/api/category/update.php", {
-            headers: {
-               'Accept': 'application/json',
-               'Content-Type': 'application/json'
-            },
-            method: 'PUT',
-            body: JSON.stringify(state.category)
-         });
+      updateCategory(state, payload) {
+         db.collection('categories').doc(payload).update({
+            name: state.category.name
+         })
       },
       deleteCategory(state, payload) {
-         fetch("https://jeffreybalmes.000webhostapp.com/api/category/delete.php", {
-            body: JSON.stringify({ id: payload.id }),
-            method: "DELETE",
-            headers: {
-               'Content-Type': 'application/json'
-            }
-         })
-            .then(response => response.json())
-            .then((message) => {
-               state.status = message;
-               state.categories.splice(payload.index, 1);
-            })
+         if (confirm('are you sure?')) {
+            db.collection('categories').doc(payload.id).delete();
+            state.categories.splice(payload.index, 1);
+         }
       }
    },
    actions: {
@@ -164,8 +146,8 @@ export const store = new Vuex.Store({
       addBlog(context) {
          context.commit('addBlog');
       },
-      updateBlog(context) {
-         context.commit('updateBlog');
+      updateBlog(context, payload) {
+         context.commit('updateBlog', payload);
       },
       deleteBlog(context, payload) {
          context.commit('deleteBlog', payload);
@@ -179,8 +161,8 @@ export const store = new Vuex.Store({
       addCategory(context) {
          context.commit('addCategory');
       },
-      updateCategory(context) {
-         context.commit('updateCategory');
+      updateCategory(context, payload) {
+         context.commit('updateCategory', payload);
       },
       deleteCategory(context, payload) {
          context.commit('deleteCategory', payload);

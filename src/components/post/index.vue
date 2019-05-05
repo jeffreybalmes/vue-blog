@@ -16,13 +16,12 @@
                         </div>
                         <div class="card-footer">
                            <small class="text-muted">{{blog.category_name}}</small>
-                           <small class="text-muted float-right">{{blog.created_at}}</small>
                         </div>
                      </div>
                   </div>
-                  <div class="form-group text-center mt-4">
+                  <!-- <div class="form-group text-center mt-4">
                      <button class="btn btn-default">Load more...</button>
-                  </div>
+                  </div> -->
                </div>
                <div v-else>
                   <h2 class="mb-3">No Posts Found...</h2>

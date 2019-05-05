@@ -25,14 +25,12 @@
                   <table class="table table-striped">
                      <thead>
                         <tr>
-                           <th scope="col">#</th>
                            <th scope="col">Category Name</th>
                            <th scope="col">Command</th>
                         </tr>
                      </thead>
                      <tbody>
                         <tr v-for="cat, i in categories">
-                           <th scope="row">{{cat.id}}</th>
                            <td>{{cat.name}}</td>
                            <td>
 
@@ -100,7 +98,7 @@ export default {
             if (this.editCategory === false) {
                this.request = this.addCategory();
             } else {
-               this.request = this.updateCategory();
+               this.request = this.updateCategory(this.id);
             }
          }
 

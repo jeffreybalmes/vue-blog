@@ -51,7 +51,9 @@ export default {
    created() {
       this.fetchBlog(this.id);
       this.fetchCategories();
-   }
+   },
+   mixins: [searchBlogs]
+
 }
 </script>
 

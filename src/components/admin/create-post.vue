@@ -5,7 +5,7 @@
             <admin-menu :isActive="component"></admin-menu>
 
             <div class="col-9">
-               <span class="alert alert-success float-right mt-4" role="alert">{{status.message}}</span>
+               <!-- <span class="alert alert-success float-right mt-4" role="alert">{{status.message}}</span> -->
                <h2 class="ml-5 mt-4 mb-3">New Post</h2>
                <form class="ml-5" @submit.prevent="addBlog()">
                   <div class="row">

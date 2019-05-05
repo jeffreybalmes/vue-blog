@@ -14,7 +14,6 @@
                   <table class="table table-striped">
                      <thead>
                         <tr>
-                           <th scope="col">#</th>
                            <th scope="col">Title</th>
                            <th scope="col">Body</th>
                            <th scope="col">Category</th>
@@ -23,7 +22,6 @@
                      </thead>
                      <tbody>
                         <tr v-for="blog, i in filteredBlogs">
-                           <th scope="row">{{blog.id}}</th>
                            <td>{{blog.title}}</td>
                            <td>
                               {{blog.body.length < 50 ? blog.body : blog.body.substring(0, 49)+" [...]"}}
